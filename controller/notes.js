@@ -24,9 +24,11 @@ async function createNotes(req, res) {
 
 async function getNotes(req, res) {
   try {
+    const limit = parseInt(req.query && req.query.limit ? req.query.limit : 10);
+    const pagination = parseInt(req.query && req.query.pagination ? req.query.pagination : 0);
     if (!req?.user?._id)
       res.status(400).send({ message: "Missing user details" });
-    const notes = await notesModel.find({ userId: req.user._id });
+    const notes = await notesModel.find({ userId: req.user._id },{userId:0}).sort({createdAt:-1}).limit(limit).skip(pagination*limit);
     const count = await notesModel.countDocuments({ userId: req.user._id });
     return res.status(200).send({
       message: "Notes create successfully",
